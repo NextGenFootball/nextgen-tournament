@@ -9,10 +9,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen text-white">
         <BackgroundWrapper>
           <Navbar />
-          {children}
+          <main className="pt-4 px-4">{children}</main>
         </BackgroundWrapper>
       </body>
     </html>
