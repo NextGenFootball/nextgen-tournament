@@ -2,57 +2,61 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
 export default function Dashboard() {
   const router = useRouter();
 
-  const [players, setPlayers] = useState([]);
-  const [tournaments, setTournaments] = useState([]);
-  const [matches, setMatches] = useState([]);
-  const [schedules, setSchedules] = useState([]);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [tournaments, setTournaments] = useState<any[]>([]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (!user) router.push("/login");
     });
 
-    onSnapshot(collection(db, "players"), (s) =>
-      setPlayers(s.docs.map(d => d.data()))
+    const unsubPlayers = onSnapshot(collection(db, "players"), (snap) => {
+      setPlayers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    const unsubTournaments = onSnapshot(
+      collection(db, "tournaments"),
+      (snap) => {
+        setTournaments(
+          snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        );
+      }
     );
 
-    onSnapshot(collection(db, "tournaments"), (s) =>
-      setTournaments(s.docs.map(d => d.data()))
-    );
+    return () => {
+      unsubAuth();
+      unsubPlayers();
+      unsubTournaments();
+    };
+  }, [router]);
 
-    onSnapshot(collection(db, "matches"), (s) =>
-      setMatches(s.docs.map(d => d.data()))
-    );
-
-    onSnapshot(collection(db, "schedules"), (s) =>
-      setSchedules(s.docs.map(d => d.data()))
-    );
-  }, []);
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white p-10">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div>
+      <h1>Dashboard</h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-10">
-        <div>Players: {players.length}</div>
-        <div>Tournaments: {tournaments.length}</div>
-        <div>Matches: {matches.length}</div>
-        <div>Schedules: {schedules.length}</div>
-      </div>
+      <button onClick={handleLogout}>Logout</button>
 
-      <button
-        onClick={() => signOut(auth)}
-        className="mt-10 bg-red-500 px-5 py-2 rounded"
-      >
-        Logout
-      </button>
+      <h2>Players</h2>
+      {players.map((p) => (
+        <div key={p.id}>{p.name}</div>
+      ))}
+
+      <h2>Tournaments</h2>
+      {tournaments.map((t) => (
+        <div key={t.id}>{t.name}</div>
+      ))}
     </div>
   );
 }
