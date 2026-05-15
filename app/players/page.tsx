@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 
 export default function Players() {
   const [players, setPlayers] = useState<any[]>([]);
@@ -16,22 +10,13 @@ export default function Players() {
 
   useEffect(() => {
     return onSnapshot(collection(db, "players"), (snap) => {
-      setPlayers(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }))
-      );
+      setPlayers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
   }, []);
 
   const addPlayer = async () => {
     if (!name) return;
-
-    await addDoc(collection(db, "players"), {
-      name,
-    });
-
+    await addDoc(collection(db, "players"), { name });
     setName("");
   };
 
@@ -40,7 +25,7 @@ export default function Players() {
   };
 
   return (
-    <div className="min-h-screen text-white p-6 bg-[length:400%_400%] animate-gradient bg-gradient-to-r from-purple-900 via-black to-green-900">
+    <div className="min-h-screen text-white bg-gradient-to-br from-black via-gray-900 to-black p-6">
       
       <h1 className="text-4xl font-bold mb-6">
         👥 Players
@@ -51,12 +36,12 @@ export default function Players() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter player name"
-          className="bg-black/40 border border-gray-600 p-3 rounded-xl w-72"
+          className="p-3 rounded-xl bg-black/40 border border-gray-600 w-72"
         />
 
         <button
           onClick={addPlayer}
-          className="bg-green-500 hover:scale-110 transition-all duration-300 px-6 py-3 rounded-xl font-bold"
+          className="px-5 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold transition"
         >
           Add
         </button>
@@ -66,15 +51,13 @@ export default function Players() {
         {players.map((p) => (
           <div
             key={p.id}
-            className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl border border-white/20 hover:scale-105 transition-all duration-300"
+            className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20"
           >
-            <h2 className="text-2xl font-bold">
-              🎮 {p.name}
-            </h2>
+            <h2 className="text-xl font-bold">🎮 {p.name}</h2>
 
             <button
               onClick={() => deletePlayer(p.id)}
-              className="mt-4 bg-red-500 hover:bg-red-700 px-4 py-2 rounded-lg"
+              className="mt-4 px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600"
             >
               Delete
             </button>
