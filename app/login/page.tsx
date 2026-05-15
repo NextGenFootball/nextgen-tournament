@@ -14,7 +14,6 @@ export default function Login() {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-
       router.push("/dashboard");
     } catch (e: any) {
       alert(e.message);
@@ -23,10 +22,8 @@ export default function Login() {
 
   return (
     <div className="flex h-screen items-center justify-center bg-black text-white">
-      <div className="w-80 rounded-2xl bg-zinc-900 p-6 shadow-xl">
-        <h1 className="mb-6 text-center text-2xl font-bold">
-          Login
-        </h1>
+      <div className="w-80 rounded-2xl bg-zinc-900 p-6">
+        <h1 className="mb-6 text-center text-2xl font-bold">Login</h1>
 
         <input
           type="email"
