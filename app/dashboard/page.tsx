@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { auth, db } from "@/lib/firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../../lib/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 
 export default function Dashboard() {
@@ -22,31 +22,27 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "players"), (snap) => {
-      setPlayers(snap.docs.map((d) => d.data()));
-    });
-    return () => unsub();
+    return onSnapshot(collection(db, "players"), (s) =>
+      setPlayers(s.docs.map((d) => d.data()))
+    );
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "tournaments"), (snap) => {
-      setTournaments(snap.docs.map((d) => d.data()));
-    });
-    return () => unsub();
+    return onSnapshot(collection(db, "tournaments"), (s) =>
+      setTournaments(s.docs.map((d) => d.data()))
+    );
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "matches"), (snap) => {
-      setMatches(snap.docs.map((d) => d.data()));
-    });
-    return () => unsub();
+    return onSnapshot(collection(db, "matches"), (s) =>
+      setMatches(s.docs.map((d) => d.data()))
+    );
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "schedules"), (snap) => {
-      setSchedules(snap.docs.map((d) => d.data()));
-    });
-    return () => unsub();
+    return onSnapshot(collection(db, "schedules"), (s) =>
+      setSchedules(s.docs.map((d) => d.data()))
+    );
   }, []);
 
   const logout = async () => {
@@ -57,36 +53,44 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-black text-white">
 
-      {/* Sidebar */}
       <div className="w-64 bg-zinc-900 p-5">
-        <h1 className="text-2xl font-bold text-green-400">
-          NextGen Football
-        </h1>
+        <h1 className="text-xl font-bold">NextGen Football</h1>
 
-        <div className="mt-10 flex flex-col gap-4">
-          <button onClick={() => router.push("/players")} className="bg-zinc-800 p-3 rounded-lg">Players</button>
-          <button onClick={() => router.push("/tournaments")} className="bg-zinc-800 p-3 rounded-lg">Tournaments</button>
-          <button onClick={() => router.push("/matches")} className="bg-zinc-800 p-3 rounded-lg">Matches</button>
-          <button onClick={() => router.push("/schedules")} className="bg-zinc-800 p-3 rounded-lg">Schedules</button>
+        <div className="mt-5 space-y-3">
+          <button onClick={() => router.push("/players")} className="w-full bg-zinc-800 p-2 rounded">
+            Players
+          </button>
+
+          <button onClick={() => router.push("/tournaments")} className="w-full bg-zinc-800 p-2 rounded">
+            Tournaments
+          </button>
+
+          <button onClick={() => router.push("/matches")} className="w-full bg-zinc-800 p-2 rounded">
+            Matches
+          </button>
+
+          <button onClick={() => router.push("/schedules")} className="w-full bg-zinc-800 p-2 rounded">
+            Schedules
+          </button>
+
+          <button onClick={() => router.push("/leaderboard")} className="w-full bg-zinc-800 p-2 rounded">
+            Leaderboard
+          </button>
         </div>
 
-        <button
-          onClick={logout}
-          className="mt-10 w-full bg-red-500 py-3 rounded-lg"
-        >
+        <button onClick={logout} className="mt-6 w-full bg-red-500 p-2 rounded">
           Logout
         </button>
       </div>
 
-      {/* Main */}
       <div className="flex-1 p-10">
-        <h1 className="text-4xl font-bold">Welcome 👋</h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
 
-        <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="bg-zinc-900 p-6 rounded-xl">Players: {players.length}</div>
-          <div className="bg-zinc-900 p-6 rounded-xl">Tournaments: {tournaments.length}</div>
-          <div className="bg-zinc-900 p-6 rounded-xl">Matches: {matches.length}</div>
-          <div className="bg-zinc-900 p-6 rounded-xl">Schedules: {schedules.length}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          <div className="bg-zinc-900 p-4 rounded">Players: {players.length}</div>
+          <div className="bg-zinc-900 p-4 rounded">Tournaments: {tournaments.length}</div>
+          <div className="bg-zinc-900 p-4 rounded">Matches: {matches.length}</div>
+          <div className="bg-zinc-900 p-4 rounded">Schedules: {schedules.length}</div>
         </div>
       </div>
     </div>

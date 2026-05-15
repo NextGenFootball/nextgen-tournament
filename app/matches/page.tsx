@@ -9,7 +9,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "@/lib/firebase";
 
 export default function Matches() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function Matches() {
 
   // ➕ Add Match
   const addMatch = async () => {
-    if (!p1 || !p2) return;
+    if (!p1.trim() || !p2.trim()) return;
 
     await addDoc(collection(db, "matches"), {
       p1,

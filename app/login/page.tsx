@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../lib/firebase";
+import { auth } from "@/lib/firebase";
 
 export default function Login() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -15,33 +14,32 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
-    } catch (e: any) {
-      alert(e.message);
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
   return (
     <div className="flex h-screen items-center justify-center bg-black text-white">
-      <div className="w-80 rounded-2xl bg-zinc-900 p-6">
-        <h1 className="mb-6 text-center text-2xl font-bold">Login</h1>
+      <div className="w-80 rounded-xl bg-zinc-900 p-6">
+        <h1 className="text-center text-2xl font-bold mb-5">Login</h1>
 
         <input
-          type="email"
+          className="w-full p-3 mb-3 text-black rounded"
           placeholder="Email"
-          className="mb-3 w-full rounded-lg p-3 text-black"
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
+          className="w-full p-3 mb-4 text-black rounded"
           placeholder="Password"
-          className="mb-4 w-full rounded-lg p-3 text-black"
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={login}
-          className="w-full rounded-lg bg-green-500 py-3 font-semibold"
+          className="w-full bg-green-500 p-3 rounded font-bold"
         >
           Login
         </button>
