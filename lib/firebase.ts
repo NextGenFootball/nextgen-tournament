@@ -1,17 +1,15 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC7iz69Lj2KWsQcnVNeRNJmQ07SnVmEo5I",
-  authDomain: "nextgen-efootball-season-2.firebaseapp.com",
-  projectId: "nextgen-efootball-season-2",
-  storageBucket: "nextgen-efootball-season-2.firebasestorage.app",
-  messagingSenderId: "458165903579",
-  appId: "1:458165903579:web:790283fccb7afaca8decfe"
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
 };
 
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
 export const db = getFirestore(app);
