@@ -1,9 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { db } from "../../lib/firebase";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 export default function PlayersPage() {
   const router = useRouter();
@@ -11,19 +17,35 @@ export default function PlayersPage() {
   const [player, setPlayer] = useState("");
   const [players, setPlayers] = useState<any[]>([]);
 
+  const playersRef = collection(db, "players");
+
+  // LOAD PLAYERS
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "players"), (snapshot) => {
-      setPlayers(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = onSnapshot(playersRef, (snap) => {
+      setPlayers(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }))
+      );
     });
+
     return () => unsub();
   }, []);
 
+  // ADD PLAYER
   const addPlayer = async () => {
     if (!player.trim()) return;
-    await addDoc(collection(db, "players"), { name: player });
+
+    await addDoc(playersRef, {
+      name: player.trim(),
+      createdAt: Date.now(),
+    });
+
     setPlayer("");
   };
 
+  // DELETE PLAYER
   const deletePlayer = async (id: string) => {
     await deleteDoc(doc(db, "players", id));
   };
@@ -31,34 +53,58 @@ export default function PlayersPage() {
   return (
     <div className="min-h-screen bg-black p-10 text-white">
 
-      <button onClick={() => router.push("/dashboard")} className="mb-6 bg-zinc-800 px-5 py-2 rounded-lg">
+      {/* BACK BUTTON */}
+      <button
+        onClick={() => router.push("/dashboard")}
+        className="mb-6 rounded-lg bg-zinc-800 px-5 py-2"
+      >
         ← Back
       </button>
 
-      <h1 className="text-4xl font-bold">Players</h1>
+      <h1 className="text-4xl font-bold">Players 🎮</h1>
 
+      {/* INPUT */}
       <div className="mt-8 flex gap-3">
         <input
           value={player}
           onChange={(e) => setPlayer(e.target.value)}
-          className="p-3 rounded-lg text-black"
-          placeholder="Enter player"
+          placeholder="Enter player name"
+          className="w-80 rounded-lg bg-white p-3 text-black"
         />
 
-        <button onClick={addPlayer} className="bg-green-500 px-6 py-3 rounded-lg">
+        <button
+          onClick={addPlayer}
+          className="rounded-lg bg-green-500 px-6 py-3 font-semibold"
+        >
           Add
         </button>
       </div>
 
-      <div className="mt-10 grid gap-4 md:grid-cols-3">
-        {players.map((p) => (
-          <div key={p.id} className="bg-zinc-900 p-5 rounded-xl flex justify-between">
-            <span>{p.name}</span>
-            <button onClick={() => deletePlayer(p.id)} className="bg-red-500 px-3 py-1 rounded">
-              Delete
-            </button>
-          </div>
-        ))}
+      {/* LIST */}
+      <div className="mt-10 grid gap-5 md:grid-cols-3">
+
+        {players.length === 0 ? (
+          <p className="text-gray-400">No players added yet</p>
+        ) : (
+          players.map((p) => (
+            <div
+              key={p.id}
+              className="rounded-2xl bg-zinc-900 p-5 flex justify-between items-center"
+            >
+              <div>
+                <h2 className="text-xl font-bold">🎮 {p.name}</h2>
+              </div>
+
+              <button
+                onClick={() => deletePlayer(p.id)}
+                className="rounded bg-red-500 px-3 py-1"
+              >
+                Delete
+              </button>
+            </div>
+          ))
+        )}
+
       </div>
 
     </div>
