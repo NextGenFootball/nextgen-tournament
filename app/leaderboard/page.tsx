@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { db } from "@/lib/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function Leaderboard() {
   const router = useRouter();
@@ -12,52 +12,67 @@ export default function Leaderboard() {
   const [matches, setMatches] = useState<any[]>([]);
 
   useEffect(() => {
-    return onSnapshot(collection(db, "players"), (s) =>
-      setPlayers(s.docs.map((d) => d.data()))
-    );
+    const unsub = onSnapshot(collection(db, "players"), (snap) => {
+      setPlayers(
+        snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      );
+    });
+
+    return () => unsub();
   }, []);
 
   useEffect(() => {
-    return onSnapshot(collection(db, "matches"), (s) =>
-      setMatches(s.docs.map((d) => d.data()))
-    );
+    const unsub = onSnapshot(collection(db, "matches"), (snap) => {
+      setMatches(
+        snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      );
+    });
+
+    return () => unsub();
   }, []);
 
   const getPoints = (name: string) => {
-    let p = 0;
+    let points = 0;
 
     matches.forEach((m) => {
-      if (m.p1 === name || m.p2 === name) {
-        const s1 = Number(m.score1);
-        const s2 = Number(m.score2);
-
-        if (m.p1 === name && s1 > s2) p += 3;
-        else if (m.p2 === name && s2 > s1) p += 3;
-        else if (s1 === s2) p += 1;
-      }
+      if (m.p1 === name && m.score1 > m.score2) points += 3;
+      else if (m.p2 === name && m.score2 > m.score1) points += 3;
+      else if (m.p1 === name || m.p2 === name) points += 1;
     });
 
-    return p;
+    return points;
   };
 
   return (
-    <div className="p-10 text-white bg-black min-h-screen">
-      <button onClick={() => router.push("/dashboard")} className="bg-zinc-800 p-2 rounded mb-5">
+    <div className="min-h-screen bg-black p-10 text-white">
+      <button
+        onClick={() => router.push("/dashboard")}
+        className="mb-6 rounded-lg bg-zinc-800 px-5 py-2"
+      >
         Back
       </button>
 
-      <h1 className="text-3xl font-bold">Leaderboard</h1>
+      <h1 className="text-4xl font-bold">
+        Leaderboard
+      </h1>
 
-      <div className="mt-6 space-y-2">
-        {players
-          .map((p) => ({ name: p.name, points: getPoints(p.name) }))
-          .sort((a, b) => b.points - a.points)
-          .map((p, i) => (
-            <div key={i} className="flex justify-between bg-zinc-900 p-3 rounded">
-              <span>#{i + 1} {p.name}</span>
-              <span>{p.points} pts</span>
-            </div>
-          ))}
+      <div className="mt-10 rounded-2xl bg-zinc-900 p-6">
+        {players.map((p, index) => (
+          <div
+            key={index}
+            className="flex justify-between border-b border-zinc-700 py-3"
+          >
+            <span>{p.name}</span>
+
+            <span>{getPoints(p.name)} pts</span>
+          </div>
+        ))}
       </div>
     </div>
   );

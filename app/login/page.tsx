@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-export default function Login() {
+export default function LoginPage() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -14,32 +15,37 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
-    } catch (err: any) {
-      alert(err.message);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-black text-white">
-      <div className="w-80 rounded-xl bg-zinc-900 p-6">
-        <h1 className="text-center text-2xl font-bold mb-5">Login</h1>
+    <div className="flex min-h-screen items-center justify-center bg-black text-white">
+      <div className="w-80 rounded-2xl bg-zinc-900 p-6">
+        <h1 className="mb-6 text-center text-3xl font-bold">
+          Login
+        </h1>
 
         <input
-          className="w-full p-3 mb-3 text-black rounded"
+          type="email"
           placeholder="Email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="mb-4 w-full rounded-lg bg-white p-3 text-black"
         />
 
         <input
           type="password"
-          className="w-full p-3 mb-4 text-black rounded"
           placeholder="Password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="mb-4 w-full rounded-lg bg-white p-3 text-black"
         />
 
         <button
           onClick={login}
-          className="w-full bg-green-500 p-3 rounded font-bold"
+          className="w-full rounded-lg bg-green-500 py-3 font-bold"
         >
           Login
         </button>
